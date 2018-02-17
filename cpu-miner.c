@@ -63,6 +63,10 @@ BOOL WINAPI ConsoleHandler(DWORD);
 #define max(a,b) (a<b ? b : a)
 #endif
 
+#if BITCOIN_FPGA
+#include "bitcoin_fpga.h"
+#endif
+
 enum workio_commands {
 	WC_GET_WORK,
 	WC_SUBMIT_WORK,
@@ -3437,6 +3441,10 @@ int main(int argc, char *argv[]) {
 		opt_n_threads = num_cpus;
 	if (!opt_n_threads)
 		opt_n_threads = 1;
+	
+#if BITCOIN_FPGA
+	opt_n_threads = 1;
+#endif
 
 	if (opt_algo == ALGO_QUARK) {
 		init_quarkhash_contexts();
@@ -3616,6 +3624,16 @@ int main(int argc, char *argv[]) {
 			return 1;
 		}
 	}
+	
+#if BITCOIN_FPGA
+	{
+		BITCOIN_FPGA_RESULT init_result = bitcoin_fpga_initialize(0x43C00000);
+		applog(LOG_INFO, "bitcoin_fpga_initialize result %d", init_result);
+		if (init_result != BITCOIN_FPGA_OK) {
+			return 1;
+		}
+	}
+#endif
 
 	/* start mining threads */
 	for (i = 0; i < opt_n_threads; i++) {

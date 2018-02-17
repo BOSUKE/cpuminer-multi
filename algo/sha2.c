@@ -9,6 +9,9 @@
  */
 
 #include "miner.h"
+#if BITCOIN_FPGA
+#include "bitcoin_fpga.h"
+#endif
 
 #include <string.h>
 #include <inttypes.h>
@@ -597,7 +600,20 @@ int scanhash_sha256d(int thr_id, struct work *work, uint32_t max_nonce, uint64_t
 	const uint32_t first_nonce = pdata[19];
 	const uint32_t Htarg = ptarget[7];
 	uint32_t n = pdata[19] - 1;
-
+	
+#if BITCOIN_FPGA
+	{
+		uint32_t nonce;
+		BITCOIN_FPGA_RESULT result = bitcoin_fpga_mining(pdata, ptarget, max_nonce, &nonce);
+		*hashes_done = nonce - first_nonce + 1;
+		pdata[19] = nonce;
+		if (result == BITCOIN_FPGA_FOUND) {
+			return 1;
+		}
+		return 0;
+	}
+#endif
+	
 #ifdef HAVE_SHA256_8WAY
 	if (sha256_use_8way())
 		return scanhash_sha256d_8way(thr_id, work, max_nonce, hashes_done);

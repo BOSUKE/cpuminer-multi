@@ -16,7 +16,7 @@ bin_PROGRAMS	= cpuminer
 dist_man_MANS	= cpuminer.1
 
 cpuminer_SOURCES = \
-  cpu-miner.c util.c \
+  cpu-miner.c util.c bitcoin_fpga.c \
   api.c sysinfos.c \
   uint256.cpp \
   sha3/sph_keccak.c \
@@ -136,7 +136,7 @@ endif
 cpuminer_LDFLAGS	= @LDFLAGS@
 cpuminer_LDADD	= @LIBCURL@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@
 cpuminer_CPPFLAGS = @LIBCURL_CPPFLAGS@ $(ALL_INCLUDES)
-cpuminer_CFLAGS   = -Wno-pointer-sign -Wno-pointer-to-int-cast $(disable_flags)
+cpuminer_CFLAGS   = -Wno-pointer-sign -Wno-pointer-to-int-cast $(disable_flags) -DBITCOIN_FPGA=1
 
 if HAVE_WINDOWS
 cpuminer_CFLAGS += -Wl,--stack,10485760
