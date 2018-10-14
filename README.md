@@ -1,195 +1,54 @@
-CPUMiner-Multi
+FPGA(bitcoin_miner)対応 CPUMiner-Multi
 ==============
 
-[![Build Status](https://travis-ci.org/tpruvot/cpuminer-multi.svg)](https://travis-ci.org/tpruvot/cpuminer-multi)
+## これは何か？
 
-This is a multi-threaded CPU miner,
-fork of [pooler](//github.com/pooler)'s cpuminer (see AUTHORS for list of contributors).
+電脳律速の同人誌「FPGA×仮想通貨」でPYNQ-Z1のFPGA(PL)に
+実装したBitcoinのマイニングハードウエア(bitcoin_miner)を利用するように改造した
+cpuminer。
 
-#### Table of contents
+同人誌「FPGA×仮想通貨」について : https://d-rissoku.net/サークルサポート/fpga_x_仮想通貨/
+bitcoin_miner のコード等 : https://github.com/BOSUKE/fpga_x_cryptocurrency
+fork元 : https://github.com/tpruvot/cpuminer-multi
 
-* [Algorithms](#algorithms)
-* [Dependencies](#dependencies)
-* [Download](#download)
-* [Build](#build)
-* [Usage instructions](#usage-instructions)
-* [Donations](#donations)
-* [Credits](#credits)
-* [License](#license)
+元々のcpuminer-multiは様々なアルゴリズムに対応しているが、この改造版cpuminer-multiは
+sha256dをbitcoin_miner(FPGA)を用いてマイニングすることしか考えずに改造。
 
-Algorithms
-==========
-#### Currently supported
- * ✓ __scrypt__ (Litecoin, Dogecoin, Feathercoin, ...)
- * ✓ __scrypt:N__
- * ✓ __scrypt-jane:N__
- * ✓ __sha256d__ (Bitcoin, Freicoin, Peercoin/PPCoin, Terracoin, ...)
- * ✓ __axiom__ (Axiom Shabal-256 based MemoHash)
- * ✓ __bastion__ (Joincoin [J])
- * ✓ __bitcore__ Permuted serie of 10 algos (BitCore)
- * ✓ __blake__ (Saffron [SFR] Blake-256)
- * ✓ __blake2s__ (NevaCoin Blake2-S 256)
- * ✓ __bmw__ (Midnight [MDT] BMW-256)
- * ✓ __cryptonight__ (Bytecoin [BCN], Monero [XMR])
- * ✓ __cryptonight-light__ (Aeon)
- * ✓ __decred__ (Blake256-14 [DCR])
- * ✓ __dmd-gr__ (Diamond-Groestl)
- * ✓ __fresh__ (FreshCoin)
- * ✓ __groestl__ (Groestlcoin)
- * ✓ __jha__ (JackpotCoin, SweepStake)
- * ✓ __lbry__ (LBRY Credits [LBC])
- * ✓ __lyra2RE__ (Cryptocoin)
- * ✓ __lyra2REv2__ (VertCoin [VTC])
- * ✓ __myr-gr__ Myriad-Groestl (MyriadCoin [MYR])
- * ✓ __neoscrypt__ (Feathercoin)
- * ✓ __nist5__ (MistCoin [MIC], TalkCoin [TAC], ...)
- * ✓ __pentablake__ (Joincoin)
- * ✓ __pluck__ (Supcoin [SUP])
- * ✓ __quark__ (Quarkcoin)
- * ✓ __qubit__ (GeoCoin)
- * ✓ __skein__ (Skeincoin, Myriadcoin, Xedoscoin, ...)
- * ✓ __skein2__ (Woodcoin)
- * ✓ __s3__ (OneCoin)
- * ✓ __sia__ (Reversed Blake2B for SIA [SC])
- * ✓ __sib__ X11 + gost streebog (SibCoin)
- * ✓ __timetravel__ Permuted serie of 8 algos (MachineCoin [MAC])
- * ✓ __tribus__ 3 of the top NIST5 algos (Denarius [DNR])
- * ✓ __vanilla__ (Blake-256 8-rounds - double sha256 [VNL])
- * ✓ __veltor__ (Veltor [VLT])
- * ✓ __xevan__ x17 x 2 on bigger header (BitSend [BSD])
- * ✓ __x11evo__ (Revolver [XRE])
- * ✓ __x11__ (Darkcoin [DRK], Hirocoin, Limecoin, ...)
- * ✓ __x12__ (GalaxyCash [GCH])
- * ✓ __x13__ (Sherlockcoin, [ACE], [B2B], [GRC], [XHC], ...)
- * ✓ __x14__ (X14, Webcoin [WEB])
- * ✓ __x15__ (RadianceCoin [RCE])
- * ✓ __x16r__ (Ravencoin [RVN])
- * ✓ __x16s__ (Pigeoncoin [PGN])
- * ✓ __x17__ (Verge [XVG])
- * ✓ __yescrypt__ (GlobalBoostY [BSTY], Unitus [UIS], MyriadCoin [MYR])
- * ✓ __zr5__ (Ziftrcoin [ZRC])
+PYNQ-Z1で動作するUbuntu 16.04 LTS (GNU/Linux 4.9.0-xilinx armv7l)でのみ動作確認済み。
 
-#### Implemented, but untested
- * ? hefty1 (Heavycoin)
- * ? keccak (Maxcoin  HelixCoin, CryptoMeth, Galleon, 365coin, Slothcoin, BitcointalkCoin)
- * ? keccakc (Creativecoin)
- * ? luffa (Joincoin, Doomcoin)
- * ? shavite3 (INKcoin)
+## 依存ライブラリなどの入手
 
-#### Planned support for
- * *scrypt-jane* (YaCoin, CopperBars, Pennies, Tickets, etc..)
- 
-Dependencies
-============
- * libcurl http://curl.haxx.se/libcurl/
- * jansson http://www.digip.org/jansson/ (jansson source is included in-tree)
- * openssl libcrypto https://www.openssl.org/
- * pthreads
- * zlib (for curl/ssl)
-
-Download
-========
- * Windows releases: https://github.com/tpruvot/cpuminer-multi/releases
- * Git tree:   https://github.com/tpruvot/cpuminer-multi
-   * Clone with `git clone https://github.com/tpruvot/cpuminer-multi`
-
-Build
-=====
-
-#### Basic *nix build instructions:
- * just use `./build.sh`
-_OR_
+fork元を参考にPYNQ-Z1上で次を実施。ただし、実際のところデフォルトのPYNQ-Z1のイメージを使っている場合、足りないのは libjansson-dev のみと思われる。
 
 ```
- ./autogen.sh	# only needed if building from git repo
- ./nomacro.pl	# only needed if building on Mac OS X or with Clang
- ./configure CFLAGS="*-march=native*" --with-crypto --with-curl
- # Use -march=native if building for a single machine
- make
+ sudo apt-get install automake autoconf pkg-config libcurl4-openssl-dev libjansson-dev libssl-dev libgmp-dev make g++
 ```
 
-#### Note for Debian/Ubuntu users:
+## ダウンロードとビルド
 
+PYNQ-Z1上にて
 ```
- apt-get install automake autoconf pkg-config libcurl4-openssl-dev libjansson-dev libssl-dev libgmp-dev make g++
-```
-
-#### Note for pi64 users:
-
-```
- ./configure --disable-assembly CFLAGS="-Ofast -march=native" --with-crypto --with-curl
+git clone https://github.com/BOSUKE/cpuminer-multi
+cd cpuminer-multi
+./build.sh
 ```
 
-#### Notes for AIX users:
- * To build a 64-bit binary, export OBJECT_MODE=64
- * GNU-style long options are not supported, but are accessible via configuration file
+## Walletとマイニングプールの準備
 
-#### Basic Windows build with Visual Studio 2013
- * All the required .lib files are now included in tree (windows only)
- * AVX enabled by default for x64 platform (AVX2 and XOP could also be used)
+すでに準備がある人はそれを使えばOK。
 
-#### Basic Windows build instructions, using MinGW64:
- * Install MinGW64 and the MSYS Developer Tool Kit (http://www.mingw.org/)
-   * Make sure you have mstcpip.h in MinGW\include
- * install pthreads-w64
- * Install libcurl devel (http://curl.haxx.se/download.html)
-   * Make sure you have libcurl.m4 in MinGW\share\aclocal
-   * Make sure you have curl-config in MinGW\bin
- * Install openssl devel (https://www.openssl.org/related/binaries.html)
- * In the MSYS shell, run:
-   * for 64bit, you can use `./mingw64.sh` else :
-     `./autogen.sh	# only needed if building from git repo`
-   ```
-   LIBCURL="-lcurldll" ./configure CFLAGS="*-march=native*"
-   # Use -march=native if building for a single machine
-   make
-    ```
+準備がない人で、とりあえずbitcoin_minerを動かしてみたい人は https://www.bitaddress.org/ に行ってマウスをぐりぐり動かして、Bitcoin Addressを生成。SHAREとSECRETの値をメモっておくだけでOK。
 
-#### Architecture-specific notes:
- * ARM:
-   * No runtime CPU detection. The miner can take advantage of some instructions specific to ARMv5E and later processors, but the decision whether to use them is made at compile time, based on compiler-defined macros.
-   * To use NEON instructions, add `"-mfpu=neon"` to CFLAGS.
- * x86:
-   * The miner checks for SSE2 instructions support at runtime, and uses them if they are available.
- * x86-64:	
-   * The miner can take advantage of AVX, AVX2 and XOP instructions, but only if both the CPU and the operating system support them.
-     * Linux supports AVX starting from kernel version 2.6.30.
-     * FreeBSD supports AVX starting with 9.1-RELEASE.
-     * Mac OS X added AVX support in the 10.6.8 update.
-     * Windows supports AVX starting from Windows 7 SP1 and Windows Server 2008 R2 SP1.
-   * The configure script outputs a warning if the assembler doesn't support some instruction sets. In that case, the miner can still be built, but unavailable optimizations are left off.
+## 実行
 
-Usage instructions
-==================
-Run "cpuminer --help" to see options.
+予め https://github.com/BOSUKE/fpga_x_cryptocurrency の  jupyter_notebooks/miner.py を用いてPYNQ-Z1を bitcoin_minerにコンフィグレーションした状態でPYNQ-Z1上で以下を実行。
 
-### Connecting through a proxy
+```
+sudo ./cpuminer -a sha256d -o stratum+tcp://（マイニングプール） -u (ユーザ名) -p (パスワード)
+```
 
-Use the --proxy option.
+上でBitcoin Addressだけは作ったという人は、以下を実行すればとりあえずマイニング処理は動作します。
 
-To use a SOCKS proxy, add a socks4:// or socks5:// prefix to the proxy host  
-Protocols socks4a and socks5h, allowing remote name resolving, are also available since libcurl 7.18.0.
-
-If no protocol is specified, the proxy is assumed to be a HTTP proxy.  
-When the --proxy option is not used, the program honors the http_proxy and all_proxy environment variables.
-
-Donations
-=========
-Donations for the work done in this fork are accepted :
-
-Tanguy Pruvot :
-* BTC: `1FhDPLPpw18X4srecguG3MxJYe4a1JsZnd`
-
-Lucas Jones :
-* MRO: `472haywQKoxFzf7asaQ4XKBc2foAY4ezk8HiN63ifW4iAbJiLnfmJfhHSR9XmVKw2WYPnszJV9MEHj9Z5WMK9VCNHaGLDmJ`
-* BTC: `139QWoktddChHsZMWZFxmBva4FM96X2dhE`
-
-Credits
-=======
-CPUMiner-multi was forked from pooler's CPUMiner, and has been started by Lucas Jones.
-* [tpruvot](https://github.com/tpruvot) added all the recent features and newer algorythmns
-* [Wolf9466](https://github.com/wolf9466) helped with Intel AES-NI support for CryptoNight
-
-License
-=======
-GPLv2.  See COPYING for details.
+```
+sudo ./cpuminer -a sha256d -o stratum+tcp://solo.ckpool.org:3333 -u （作成したBitcoin Address(SHARE))
+```
